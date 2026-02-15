@@ -176,8 +176,11 @@ def load_dataset_profile() -> Dict[str, Any]:
 def load_best_model() -> Dict[str, Any]:
     with open("models/best_model_metadata.json", "r", encoding="utf-8") as f:
         best_meta = json.load(f)
+    model_path = Path(best_meta["model_path"])
+    if not model_path.is_absolute():
+        model_path = Path(__file__).parent / model_path
     return {
-        "model": load(best_meta["model_path"]),
+        "model": load(model_path),
         "threshold": float(best_meta["threshold_opt"]),
         "meta": best_meta,
     }

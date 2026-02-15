@@ -1,6 +1,6 @@
 {
   "best_model_name": "hist_gradient_boosting",
-  "model_path": "/Users/osmac/entrenamiento modelo real ML fraude/models/hgb_preauth.joblib",
+  "model_path": "models/hgb_preauth.joblib",
   "threshold_opt": 0.95,
   "metrics": {
     "name": "hist_gradient_boosting",
