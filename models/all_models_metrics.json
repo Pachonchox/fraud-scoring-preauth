@@ -1,0 +1,37 @@
+[
+  {
+    "name": "random_forest",
+    "roc_auc": 0.9557780758308306,
+    "pr_auc": 0.7843108346583342,
+    "threshold_opt": 0.75,
+    "precision_fraud_opt": 0.8756906077348067,
+    "recall_fraud_opt": 0.6788008565310493,
+    "f1_fraud_opt": 0.7647768395657418
+  },
+  {
+    "name": "hist_gradient_boosting",
+    "roc_auc": 0.9581867771607498,
+    "pr_auc": 0.7966420471178624,
+    "threshold_opt": 0.95,
+    "threshold_source": "validation",
+    "precision_fraud_opt": 0.9024390243902439,
+    "recall_fraud_opt": 0.7130620985010707,
+    "f1_fraud_opt": 0.7966507177033493,
+    "tuned_params": {
+      "max_depth": 8,
+      "max_leaf_nodes": 63,
+      "learning_rate": 0.04,
+      "max_iter": 350,
+      "min_samples_leaf": 15
+    }
+  },
+  {
+    "name": "mlp",
+    "roc_auc": 0.9562924289628869,
+    "pr_auc": 0.7397740738399874,
+    "threshold_opt": 0.95,
+    "precision_fraud_opt": 0.6131907308377896,
+    "recall_fraud_opt": 0.7366167023554604,
+    "f1_fraud_opt": 0.669260700389105
+  }
+]

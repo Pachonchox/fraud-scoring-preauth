@@ -1,0 +1,45 @@
+{
+  "best_model_name": "hist_gradient_boosting",
+  "model_path": "/Users/osmac/entrenamiento modelo real ML fraude/models/hgb_preauth.joblib",
+  "threshold_opt": 0.95,
+  "metrics": {
+    "name": "hist_gradient_boosting",
+    "roc_auc": 0.9581867771607498,
+    "pr_auc": 0.7966420471178624,
+    "threshold_opt": 0.95,
+    "threshold_source": "validation",
+    "precision_fraud_opt": 0.9024390243902439,
+    "recall_fraud_opt": 0.7130620985010707,
+    "f1_fraud_opt": 0.7966507177033493,
+    "tuned_params": {
+      "max_depth": 8,
+      "max_leaf_nodes": 63,
+      "learning_rate": 0.04,
+      "max_iter": 350,
+      "min_samples_leaf": 15
+    }
+  },
+  "hyperparameters": {
+    "categorical_features": "from_dtype",
+    "class_weight": null,
+    "early_stopping": true,
+    "interaction_cst": null,
+    "l2_regularization": 0.0,
+    "learning_rate": 0.04,
+    "loss": "log_loss",
+    "max_bins": 255,
+    "max_depth": 8,
+    "max_features": 1.0,
+    "max_iter": 350,
+    "max_leaf_nodes": 63,
+    "min_samples_leaf": 15,
+    "monotonic_cst": null,
+    "n_iter_no_change": 10,
+    "random_state": 42,
+    "scoring": "loss",
+    "tol": 1e-07,
+    "validation_fraction": 0.1,
+    "verbose": 0,
+    "warm_start": false
+  }
+}

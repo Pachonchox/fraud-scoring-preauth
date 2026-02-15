@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# Entorno virtual
+.venv/
+venv/
+
+# IDE / OS
+.DS_Store
+.vscode/
+.idea/
+*.swp
+
+# Datos crudos (pesados, se regeneran con scripts)
+data/raw/auth_events.csv
+data/raw/labels.csv
+data/raw/ml_dataset.csv
+
+# Modelo RF pesado (12MB, no se usa en dashboard)
+models/rf_preauth.joblib
+
+# Jupyter
+*.ipynb_checkpoints/
+
+# Secretos
+.env
+*.pem

@@ -1,0 +1,31 @@
+{
+  "issuer_profile": {
+    "issuer_id": "BANK_CL_UNIQUE_001",
+    "issuer_name": "Banco Unico Chile",
+    "issuer_country": "CL",
+    "issuer_id_nunique": 1,
+    "home_country_nunique": 1
+  },
+  "dataset_shape": {
+    "rows": 300000,
+    "columns": 58
+  },
+  "date_range_utc": {
+    "start": "2025-11-01 00:00:59.057345",
+    "end": "2026-02-13 01:03:08.618177037"
+  },
+  "channel_mix": {
+    "ecommerce": 0.5802,
+    "pos": 0.4198
+  },
+  "fraud": {
+    "fraud_rate": 0.0077866666666666666,
+    "fraud_scenarios": {
+      "cnp_takeover": 0.3074,
+      "card_testing": 0.2461,
+      "counterfeit_cp": 0.2406,
+      "friendly_fraud": 0.2059
+    }
+  },
+  "approved_rate": 0.92063
+}

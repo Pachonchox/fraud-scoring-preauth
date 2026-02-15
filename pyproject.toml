@@ -1,0 +1,14 @@
+[project]
+name = "entrenamiento-ml-fraude"
+version = "0.1.0"
+description = "Proyecto de detección de fraude con datos sintéticos de autorizaciones."
+requires-python = ">=3.10"
+dependencies = []
+
+[tool.black]
+line-length = 88
+target-version = ["py310"]
+
+[tool.isort]
+profile = "black"
+
