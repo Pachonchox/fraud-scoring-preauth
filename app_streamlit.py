@@ -950,6 +950,47 @@ def render_tab_impacto(
         "En producción se ajusta según la política de riesgo del emisor y puede diferenciarse por segmento."
     )
 
+    # Escenarios de ejemplo vs threshold
+    st.markdown("### ¿Cómo reacciona el modelo ante distintas transacciones?")
+    st.markdown(
+        "Estos 6 escenarios predefinidos muestran cómo el modelo clasifica cada transacción "
+        "según el threshold configurado arriba."
+    )
+    base_row = build_default_row(df)
+    scenario_rows = []
+    review_thr = manual_threshold * 0.85
+    for sc_name in SCENARIO_PRESETS:
+        sc_row = apply_scenario(base_row, sc_name)
+        X_sc = pd.DataFrame([sc_row])
+        sc_score = float(model.predict_proba(X_sc)[:, 1][0])
+        if sc_score >= manual_threshold:
+            sc_decision = "Declinar"
+        elif sc_score >= review_thr:
+            sc_decision = "Revisar"
+        else:
+            sc_decision = "Aprobar"
+        scenario_rows.append({
+            "Escenario": sc_name,
+            "Score": f"{sc_score:.2%}",
+            "Decisión": sc_decision,
+        })
+    scenario_table = pd.DataFrame(scenario_rows)
+
+    def color_decision(val: str) -> str:
+        if val == "Declinar":
+            return "background-color: #fecaca; color: #991b1b; font-weight: 600"
+        elif val == "Revisar":
+            return "background-color: #fef3c7; color: #92400e; font-weight: 600"
+        return "background-color: #d1fae5; color: #065f46; font-weight: 600"
+
+    styled = scenario_table.style.map(color_decision, subset=["Decisión"])
+    st.dataframe(styled, use_container_width=True, hide_index=True)
+    st.caption(
+        f"Umbral de declinación: {manual_threshold:.2f} · "
+        f"Zona de revisión: {review_thr:.2f}–{manual_threshold:.2f} · "
+        "Ajusta el slider de threshold arriba para ver cómo cambian las decisiones."
+    )
+
     # Casos de uso
     st.markdown("### Casos de uso en producción")
     uc1, uc2, uc3 = st.columns(3)
