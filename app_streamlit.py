@@ -621,11 +621,11 @@ def render_hero(meta: Dict[str, Any], model_metrics: Dict[str, Any]) -> None:
         unsafe_allow_html=True,
     )
     c1, c2, c3, c4, c5 = st.columns(5)
-    c1.metric("Modelo", "HGB" if "hist" in meta["best_model_name"] else meta["best_model_name"])
-    c2.metric("ROC AUC", f"{model_metrics['roc_auc']:.3f}")
-    c3.metric("PR AUC", f"{model_metrics['pr_auc']:.3f}")
-    c4.metric("F1 fraude", f"{model_metrics['f1_fraud_opt']:.3f}")
-    c5.metric("Threshold", f"{meta['threshold_opt']:.2f}")
+    c1.metric("Algoritmo", "HistGradientBoosting")
+    c2.metric("Capacidad de detección", f"{model_metrics['roc_auc']:.1%}")
+    c3.metric("Precisión en alertas", f"{model_metrics['precision_fraud_opt']:.1%}")
+    c4.metric("Fraudes detectados", f"{model_metrics['recall_fraud_opt']:.1%}")
+    c5.metric("Umbral de decisión", f"{meta['threshold_opt']:.0%}")
 
 
 def render_tab_problema(profile: Dict[str, Any]) -> None:
