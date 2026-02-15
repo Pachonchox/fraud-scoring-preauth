@@ -327,16 +327,6 @@ def apply_style() -> None:
         .savings-metric .number { font-size: 1.6rem; font-weight: 800; color: #065f46; }
         .savings-metric .label { font-size: 0.82rem; color: #047857; text-transform: uppercase; letter-spacing: 0.03em; }
 
-        /* Winner badge */
-        .winner-badge {
-            display: inline-block;
-            background: #fef3c7;
-            color: #92400e;
-            border-radius: 4px;
-            padding: 2px 8px;
-            font-weight: 700;
-            font-size: 0.78rem;
-        }
         </style>
         """,
         unsafe_allow_html=True,
@@ -349,11 +339,12 @@ def apply_style() -> None:
 
 def build_default_row(df: pd.DataFrame) -> pd.Series:
     """Selecciona una fila base no-fraudulenta con historial normal (no primera transacción)."""
-    candidates = df[
-        (df["fraud_attempt"] == 0)
-        & (df.get("device_time_since_prev_min", pd.Series(dtype=float)).lt(500000) if "device_time_since_prev_min" in df.columns else True)
-        & (df.get("card_time_since_prev_min", pd.Series(dtype=float)).lt(500000) if "card_time_since_prev_min" in df.columns else True)
-    ]
+    mask = df["fraud_attempt"] == 0
+    if "device_time_since_prev_min" in df.columns:
+        mask = mask & (df["device_time_since_prev_min"] < 500000)
+    if "card_time_since_prev_min" in df.columns:
+        mask = mask & (df["card_time_since_prev_min"] < 500000)
+    candidates = df[mask]
     if candidates.empty:
         candidates = df[df["fraud_attempt"] == 0]
     return candidates.drop(columns=["fraud_attempt"]).sample(1, random_state=42).iloc[0].copy()
@@ -765,24 +756,25 @@ def render_tab_modelo(
     # --- Feature engineering ---
     st.markdown("### Feature engineering")
     st.markdown(
-        f'<div class="info-badge">{len(feature_columns)} features · 0 post-autorización · 0 leakage</div>',
+        f'<div class="info-badge">{len(feature_columns)} features · información pre-autorización</div>',
         unsafe_allow_html=True,
     )
     st.markdown(
-        '<div class="highlight-box"><strong>Principio anti-leakage</strong>: solo se usan features '
-        'disponibles en el mensaje de autorización ISO 8583. Ningún dato post-decisión '
-        '(response_code, auth_code) entra al modelo.</div>',
+        '<div class="highlight-box"><strong>Diseño anti-leakage</strong>: todos los features usan '
+        'información disponible al momento de la decisión. El historial de rechazos previos de la '
+        'tarjeta (response_code de transacciones pasadas) se incluye como señal de velocidad, ya que '
+        'el emisor conoce ese historial antes de decidir. No se usa ningún resultado de la transacción actual.</div>',
         unsafe_allow_html=True,
     )
 
     feat_table = pd.DataFrame([
-        {"Tipo": "Transaccionales", "Cantidad": 5, "Ejemplos": "amount, log_amount, channel, mcc, card_present"},
-        {"Tipo": "Autenticación", "Cantidad": 5, "Ejemplos": "cvv_result, three_ds_status, eci, tokenized, wallet_type"},
-        {"Tipo": "Geográficas", "Cantidad": 5, "Ejemplos": "merchant_country, ip_country, foreign flags, mismatch"},
+        {"Tipo": "Transaccionales", "Cantidad": 8, "Ejemplos": "amount, log_amount, channel, mcc, card_present, currency, mti, stan"},
+        {"Tipo": "Autenticación", "Cantidad": 8, "Ejemplos": "cvv_result, cvv_negative_flag, three_ds_status, three_ds_failed_flag, eci, avs_result, tokenized, wallet_type"},
+        {"Tipo": "Geográficas", "Cantidad": 8, "Ejemplos": "merchant_country, merchant_city, ip_country, home_country, issuer_name, foreign_merchant_flag, ecom_foreign_ip_flag, ecom_ip_merchant_mismatch_flag"},
         {"Tipo": "Temporales", "Cantidad": 4, "Ejemplos": "dow, hour, month, night_txn_flag"},
-        {"Tipo": "Velocidad tarjeta", "Cantidad": 7, "Ejemplos": "card_txn_count_1h/24h, card_sum_amount_24h, decline_spike"},
-        {"Tipo": "Velocidad dispositivo", "Cantidad": 7, "Ejemplos": "device_txn_count_1h/24h, device_sum_amount_24h"},
-        {"Tipo": "Flags de riesgo", "Cantidad": 5, "Ejemplos": "risky_entry_mode, cvv_negative, ecom_foreign_ip"},
+        {"Tipo": "Velocidad tarjeta", "Cantidad": 9, "Ejemplos": "card_txn_count_1h/24h, card_sum_amount_24h, card_time_since_prev_min, card_pct_declines_prev30, card_decline_spike_flag, card_velocity_high_1h_flag, card_new_merchant_24h_flag, card_unique_merchants_24h"},
+        {"Tipo": "Velocidad dispositivo", "Cantidad": 8, "Ejemplos": "device_txn_count_1h/24h, device_sum_amount_24h, device_time_since_prev_min, device_pct_declines_prev30, device_velocity_high_1h_flag, device_new_merchant_24h_flag, device_unique_merchants_24h"},
+        {"Tipo": "Merchant y riesgo", "Cantidad": 8, "Ejemplos": "is_hot_merchant, merchant_name, risky_entry_mode_flag, ecommerce_flag, high_amount_flag, pos_entry_mode, pos_condition_code, product_type"},
     ])
     st.dataframe(feat_table, use_container_width=True, hide_index=True)
 
