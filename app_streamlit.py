@@ -166,43 +166,10 @@ def load_dataset() -> pd.DataFrame:
 
 
 @st.cache_data
-def load_raw_dataset() -> pd.DataFrame:
-    raw_csv = PROCESSED_DATA_DIR.parent / "raw" / "ml_dataset.csv"
-    usecols = [
-        "issuer_id", "issuer_name", "home_country", "transmission_ts_utc",
-        "channel", "fraud_attempt", "fraud_scenario", "mcc", "merchant_country",
-        "amount", "pos_entry_mode", "ip_country", "three_ds_status",
-        "cvv_result", "response_code",
-    ]
-    return pd.read_csv(raw_csv, usecols=usecols)
-
-
-@st.cache_data
-def load_dataset_profile(raw_df: pd.DataFrame) -> Dict[str, Any]:
+def load_dataset_profile() -> Dict[str, Any]:
     profile_path = PROCESSED_DATA_DIR.parent / "raw" / "dataset_profile.json"
-    if profile_path.exists():
-        with profile_path.open("r", encoding="utf-8") as f:
-            return json.load(f)
-
-    ts = pd.to_datetime(raw_df["transmission_ts_utc"])
-    return {
-        "issuer_profile": {
-            "issuer_id": raw_df["issuer_id"].iloc[0],
-            "issuer_name": raw_df["issuer_name"].iloc[0],
-            "issuer_country": raw_df["home_country"].iloc[0],
-        },
-        "dataset_shape": {"rows": int(len(raw_df)), "columns": int(raw_df.shape[1])},
-        "date_range_utc": {"start": str(ts.min()), "end": str(ts.max())},
-        "channel_mix": raw_df["channel"].value_counts(normalize=True).round(4).to_dict(),
-        "fraud": {
-            "fraud_rate": float(raw_df["fraud_attempt"].mean()),
-            "fraud_scenarios": (
-                raw_df.loc[raw_df["fraud_attempt"] == 1, "fraud_scenario"]
-                .value_counts(normalize=True).round(4).to_dict()
-            ),
-        },
-        "approved_rate": float((raw_df["response_code"] == "00").mean()),
-    }
+    with profile_path.open("r", encoding="utf-8") as f:
+        return json.load(f)
 
 
 @st.cache_resource
@@ -658,7 +625,7 @@ def render_hero(meta: Dict[str, Any], model_metrics: Dict[str, Any]) -> None:
     c5.metric("Threshold", f"{meta['threshold_opt']:.2f}")
 
 
-def render_tab_problema(profile: Dict[str, Any], raw_df: pd.DataFrame) -> None:
+def render_tab_problema(profile: Dict[str, Any]) -> None:
     # --- El problema ---
     st.markdown("### El problema")
     st.markdown(
@@ -1046,8 +1013,7 @@ def main() -> None:
     apply_style()
 
     df = load_dataset()
-    raw_df = load_raw_dataset()
-    profile = load_dataset_profile(raw_df)
+    profile = load_dataset_profile()
     model_info = load_best_model()
     model = model_info["model"]
     threshold_default = model_info["threshold"]
@@ -1064,7 +1030,7 @@ def main() -> None:
     )
 
     with tab1:
-        render_tab_problema(profile, raw_df)
+        render_tab_problema(profile)
 
     with tab2:
         render_tab_modelo(meta, all_metrics, df)
