@@ -406,9 +406,41 @@ def apply_scenario(base_row: pd.Series, scenario: str) -> pd.Series:
     # Forzar señales de riesgo diferenciadas por tipo de fraude
     is_fraud_scenario = scenario.startswith("Fraude") or scenario == "Card testing"
 
-    if is_fraud_scenario and is_ecom:
-        # --- Fraude ecommerce (CNP takeover, card testing) ---
-        # Señales clave: 3DS fallido + CVV negativo + IP extranjera + dispositivo nuevo
+    is_card_testing = scenario == "Card testing"
+
+    if is_card_testing:
+        # --- Card testing: ráfagas rápidas de montos pequeños ---
+        # Señales: 3DS fallido + CVV negativo + IP extranjera + dispositivo nuevo
+        # + velocidad alta en tarjeta (múltiples intentos rápidos)
+        if "three_ds_failed_flag" in row.index:
+            row["three_ds_failed_flag"] = 1
+        if "cvv_negative_flag" in row.index:
+            row["cvv_negative_flag"] = 1
+        if "ecom_foreign_ip_flag" in row.index:
+            row["ecom_foreign_ip_flag"] = 1
+        # Dispositivo nuevo
+        if "device_time_since_prev_min" in row.index:
+            row["device_time_since_prev_min"] = 999999.0
+        if "device_new_merchant_24h_flag" in row.index:
+            row["device_new_merchant_24h_flag"] = 1
+        if "device_txn_count_1h" in row.index:
+            row["device_txn_count_1h"] = 0.0
+        if "device_txn_count_24h" in row.index:
+            row["device_txn_count_24h"] = 0.0
+        if "device_sum_amount_24h" in row.index:
+            row["device_sum_amount_24h"] = 0.0
+        # Tarjeta recién robada: sin historial previo en el emisor
+        if "card_time_since_prev_min" in row.index:
+            row["card_time_since_prev_min"] = 999999.0
+        if "card_txn_count_1h" in row.index:
+            row["card_txn_count_1h"] = 0.0
+        if "card_txn_count_24h" in row.index:
+            row["card_txn_count_24h"] = 0.0
+        if "card_sum_amount_24h" in row.index:
+            row["card_sum_amount_24h"] = 0.0
+
+    elif is_fraud_scenario and is_ecom:
+        # --- CNP takeover: dispositivo nuevo + IP extranjera ---
         if "three_ds_failed_flag" in row.index:
             row["three_ds_failed_flag"] = 1
         if "cvv_negative_flag" in row.index:
