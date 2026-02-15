@@ -621,11 +621,26 @@ def render_hero(meta: Dict[str, Any], model_metrics: Dict[str, Any]) -> None:
         unsafe_allow_html=True,
     )
     c1, c2, c3, c4, c5 = st.columns(5)
-    c1.metric("Algoritmo", "HistGradientBoosting")
-    c2.metric("Capacidad de detección", f"{model_metrics['roc_auc']:.1%}")
-    c3.metric("Precisión en alertas", f"{model_metrics['precision_fraud_opt']:.1%}")
-    c4.metric("Fraudes detectados", f"{model_metrics['recall_fraud_opt']:.1%}")
-    c5.metric("Umbral de decisión", f"{meta['threshold_opt']:.0%}")
+    c1.metric(
+        "Algoritmo", "HistGradientBoosting",
+        help="Tipo de modelo de machine learning utilizado. HistGradientBoosting es un algoritmo basado en árboles de decisión que aprende de forma iterativa, ideal para detectar patrones complejos de fraude.",
+    )
+    c2.metric(
+        "Capacidad de detección", f"{model_metrics['roc_auc']:.1%}",
+        help="Qué tan bien distingue el modelo entre transacciones legítimas y fraudulentas. 95.8% significa que en el 95.8% de los casos, el modelo asigna un score más alto a una transacción fraudulenta que a una legítima.",
+    )
+    c3.metric(
+        "Precisión en alertas", f"{model_metrics['precision_fraud_opt']:.1%}",
+        help="De cada 10 transacciones que el modelo marca como fraude, 9 realmente lo son. Solo 1 de cada 10 alertas es una falsa alarma.",
+    )
+    c4.metric(
+        "Fraudes detectados", f"{model_metrics['recall_fraud_opt']:.1%}",
+        help="De cada 10 fraudes reales que ocurren, el modelo logra detectar 7. Los 3 restantes pasan sin ser detectados.",
+    )
+    c5.metric(
+        "Umbral de decisión", f"{meta['threshold_opt']:.0%}",
+        help="El modelo asigna un score de 0% a 100% a cada transacción. Solo cuando el score supera el 95% se declina la transacción. Un umbral alto prioriza no molestar al cliente legítimo.",
+    )
 
 
 def render_tab_problema(profile: Dict[str, Any]) -> None:
