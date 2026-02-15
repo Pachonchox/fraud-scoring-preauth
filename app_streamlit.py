@@ -857,7 +857,10 @@ def render_tab_impacto(
     p1, p2, p3 = st.columns(3)
     total_tx = p1.slider("Volumen de transacciones", 10000, 500000, 100000, 10000)
     avg_ticket = p2.slider("Ticket promedio (CLP)", 5000.0, 300000.0, 25000.0, 5000.0)
-    manual_threshold = p3.slider("Threshold operativo", 0.10, 0.99, float(threshold_default), 0.01)
+    manual_threshold = p3.slider(
+        "Threshold operativo", 0.10, 0.99, float(threshold_default), 0.01,
+        key="global_threshold",
+    )
 
     cost_fn_factor = 1.0
     cost_fp_factor = 0.1
@@ -943,6 +946,9 @@ def render_tab_demo(
     model: Any,
     threshold_default: float,
 ) -> None:
+    # Leer threshold desde session_state (sincronizado con tab Impacto)
+    active_threshold = st.session_state.get("global_threshold", threshold_default)
+
     st.markdown("### El modelo en acción")
     st.markdown("Selecciona un escenario y observa cómo el modelo asigna el score de riesgo.")
 
@@ -969,7 +975,7 @@ def render_tab_demo(
         fraud_hint = "counterfeit_cp"
 
     risk_reasons = explain_risk_from_features(
-        row=X_input.iloc[0], score=score, threshold=threshold_default, scenario_hint=fraud_hint,
+        row=X_input.iloc[0], score=score, threshold=active_threshold, scenario_hint=fraud_hint,
     )
 
     # Layout de resultado
@@ -978,9 +984,9 @@ def render_tab_demo(
     with col_score:
         c1, c2, c3 = st.columns(3)
         c1.metric("Score de fraude", f"{score:.2%}")
-        c2.metric("Threshold", f"{threshold_default:.2f}")
+        c2.metric("Threshold", f"{active_threshold:.2f}")
 
-        decision = "Revisar / Declinar" if score >= threshold_default else "Aprobar"
+        decision = "Revisar / Declinar" if score >= active_threshold else "Aprobar"
         c3.metric("Decisión", decision)
 
         score_pct = min(score * 100, 100)
