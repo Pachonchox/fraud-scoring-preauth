@@ -491,10 +491,13 @@ def explain_risk_from_features(
 ) -> list[str]:
     reasons: list[str] = []
 
+    review_threshold = threshold * 0.85
     if score >= threshold:
-        reasons.append(f"Score ({score:.2%}) sobre el threshold operativo ({threshold:.2f}).")
+        reasons.append(f"Score ({score:.2%}) sobre el umbral de declinación ({threshold:.2f}).")
+    elif score >= review_threshold:
+        reasons.append(f"Score ({score:.2%}) en zona de revisión manual ({review_threshold:.2f}–{threshold:.2f}).")
     else:
-        reasons.append(f"Score ({score:.2%}) bajo el threshold operativo ({threshold:.2f}).")
+        reasons.append(f"Score ({score:.2%}) bajo el umbral operativo ({threshold:.2f}).")
 
     is_ecom = row.get("channel", "") == "ecommerce"
     if is_ecom:
@@ -1018,7 +1021,13 @@ def render_tab_demo(
         c1.metric("Score de fraude", f"{score:.2%}")
         c2.metric("Threshold", f"{active_threshold:.2f}")
 
-        decision = "Revisar / Declinar" if score >= active_threshold else "Aprobar"
+        review_threshold = active_threshold * 0.85  # zona de revisión manual
+        if score >= active_threshold:
+            decision = "Declinar"
+        elif score >= review_threshold:
+            decision = "Revisar"
+        else:
+            decision = "Aprobar"
         c3.metric("Decisión", decision)
 
         score_pct = min(score * 100, 100)
