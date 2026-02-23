@@ -16,6 +16,7 @@ from src.features.build_features import (
     _add_business_features,
     _drop_leaky_and_id_columns,
 )
+from ui.styles import inject_global_styles
 
 APP_VERSION = "v3.0 — portfolio narrativo"
 
@@ -193,144 +194,6 @@ def load_all_models_metrics() -> list[Dict[str, Any]]:
         with metrics_path.open("r", encoding="utf-8") as f:
             return json.load(f)
     return []
-
-
-# ---------------------------------------------------------------------------
-# Estilos CSS
-# ---------------------------------------------------------------------------
-
-def apply_style() -> None:
-    st.markdown(
-        """
-        <style>
-        .block-container { padding-top: 1.6rem; padding-bottom: 2.2rem; }
-
-        /* Metric cards */
-        div[data-testid="stMetric"] {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 14px 16px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-        }
-        div[data-testid="stMetricLabel"] p {
-            font-size: 0.82rem !important;
-            font-weight: 600 !important;
-            text-transform: uppercase;
-            letter-spacing: 0.03em;
-            color: #64748b !important;
-        }
-        div[data-testid="stMetricValue"] div {
-            color: #1e293b !important;
-            font-weight: 700 !important;
-        }
-
-        /* Tabs */
-        .stTabs [data-baseweb="tab-list"] {
-            gap: 6px;
-            border-bottom: 2px solid #e2e8f0;
-        }
-        .stTabs [aria-selected="true"] {
-            border-bottom: 3px solid #1d4ed8 !important;
-            font-weight: 700 !important;
-        }
-
-        /* Hero card */
-        .hero-card {
-            background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 50%, #2563eb 100%);
-            border-radius: 12px;
-            padding: 22px 28px;
-            color: #ffffff;
-            margin-bottom: 16px;
-            box-shadow: 0 4px 12px rgba(30,64,175,0.25);
-        }
-        .hero-card h2, .hero-card h3, .hero-card p { color: #ffffff !important; margin: 0; }
-        .hero-card p { opacity: 0.92; margin-top: 6px; font-size: 1.05rem; }
-
-        /* Pattern cards */
-        .pattern-card {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 10px;
-            padding: 16px 18px;
-            height: 100%;
-        }
-        .pattern-card h4 { margin: 0 0 6px 0; color: #1e293b; font-size: 0.95rem; }
-        .pattern-card p { margin: 0; color: #475569; font-size: 0.85rem; line-height: 1.45; }
-
-        /* Info badge */
-        .info-badge {
-            display: inline-block;
-            background: #ecfdf5;
-            color: #065f46;
-            border: 1px solid #a7f3d0;
-            border-radius: 20px;
-            padding: 6px 16px;
-            font-weight: 600;
-            font-size: 0.88rem;
-            margin: 8px 0;
-        }
-
-        /* Highlight box */
-        .highlight-box {
-            background: #eff6ff;
-            border-left: 4px solid #3b82f6;
-            border-radius: 0 8px 8px 0;
-            padding: 12px 16px;
-            margin: 10px 0;
-            color: #1e40af;
-            font-size: 0.9rem;
-        }
-
-        /* Use-case cards */
-        .usecase-card {
-            background: #f1f5f9;
-            border-radius: 10px;
-            padding: 16px 18px;
-            height: 100%;
-        }
-        .usecase-card h4 { margin: 0 0 6px 0; color: #1e293b; font-size: 0.93rem; }
-        .usecase-card p { margin: 0; color: #475569; font-size: 0.85rem; line-height: 1.45; }
-
-        /* Score bar */
-        .score-bar-container {
-            background: #e2e8f0;
-            border-radius: 8px;
-            height: 28px;
-            position: relative;
-            overflow: hidden;
-            margin: 8px 0;
-        }
-        .score-bar-fill {
-            height: 100%;
-            border-radius: 8px;
-            transition: width 0.4s ease;
-        }
-        .score-bar-label {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-weight: 700;
-            font-size: 0.85rem;
-            color: #1e293b;
-        }
-
-        /* Savings highlight */
-        .savings-metric {
-            background: #ecfdf5;
-            border: 2px solid #10b981;
-            border-radius: 12px;
-            padding: 16px;
-            text-align: center;
-        }
-        .savings-metric .number { font-size: 1.6rem; font-weight: 800; color: #065f46; }
-        .savings-metric .label { font-size: 0.82rem; color: #047857; text-transform: uppercase; letter-spacing: 0.03em; }
-
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
 
 
 # ---------------------------------------------------------------------------
@@ -1108,7 +971,7 @@ def render_tab_demo(
 
 def main() -> None:
     st.set_page_config(page_title="Fraud Scoring — Portfolio", layout="wide")
-    apply_style()
+    inject_global_styles(theme="dark")
 
     df = load_dataset()
     profile = load_dataset_profile()
